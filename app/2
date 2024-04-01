@@ -1,0 +1,112 @@
+Lab Cycle 2:
+
+Develop an app to display a progress Bar and show a message with alert dialog.
+ 
+
+Step1 : Create a new Project and Wait for the Gradle build.
+Step2 : Add the Progress Bar and Button from the Palette
+ 
+XML Code of Activity_main.xml
+
+<Button
+    android:id="@+id/button"
+    android:layout_width="match_parent"
+    android:layout_margin="25dp"
+    android:layout_height="wrap_content"
+    android:text="Start"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.498"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_bias="0.702" />
+
+<ProgressBar
+    android:id="@+id/progressBar2"
+    style="?android:attr/progressBarStyleHorizontal"
+    android:layout_width="345dp"
+    android:layout_height="32dp"
+
+
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.392"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_bias="0.418" />
+
+<TextView
+    android:id="@+id/textView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Progress Bar"
+    android:textSize="45dp"
+    android:textAlignment="center"
+    android:textColor="#785412"
+    app:layout_constraintBottom_toTopOf="@+id/progressBar2"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.498"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_bias="0.106" />
+
+Java Code for MainActivity
+//Variables declration
+
+
+public Button button;
+    ProgressBar Progress;
+    CountDownTimer t;
+    float total;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+
+// Program starts
+
+
+        button=findViewById(R.id.button);
+        Progress=findViewById(R.id.progressBar2);
+
+        Progress.setVisibility(View.INVISIBLE);
+        Progress.setMax(100);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Progress.setVisibility(View.VISIBLE);
+                long min= 10*1000;//second * milisecond;
+                new CountDownTimer(min,1000)
+                {
+                    @Override
+                    public void onTick(long l) {
+                        long a = min-l;
+                        total= ((float)a/(float)min)*100;
+                        Log.e("Total", String.valueOf( (a/min)));
+                        Progress.setProgress((int) total);
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        AlertDialog.Builder d = new AlertDialog.Builder(MainActivity.this);
+                        d.setTitle(" Completed ").setMessage(" Loding as Been Completed").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(MainActivity.this,"DOne",Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        AlertDialog dialog = d.create();
+                        dialog.show();
+                    }
+                }.start();
+//
+
+            }
+        });
+    }
+
+
+
+
