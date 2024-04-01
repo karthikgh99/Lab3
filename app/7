@@ -1,0 +1,102 @@
+Program 7:
+
+Build a Simple Web page usingnPWA by adding a Service Worker
+
+Step 1:
+
+	VS code software is using to run PWA programs.
+	Once program is working, can run the code in emulator also through Android studio through local IP.
+
+ create a folder name called   js   folder -----> with in js folder create two files named as 
+1. start.js ( which is used to start the service worker )
+2. sw.js (Service worker to register / Installing and Activation)
+
+note: https://web.dev/articles/service-worker-lifecycle  (service worker lifecycle methods are available in the given link)
+
+
+start.js
+
+if ('serviceWorker' in navigator) {
+	navigator.serviceWorker
+	.register("/js/sw.js")
+	.then((reg)=>console.log("registered",reg))
+	.catch((err)=>console.log("err",err));
+} else {
+	console.log('No service worker support in this browser');
+}
+
+sw.js
+
+// method that runs when service worker is installed first time
+self.addEventListener('install', event => {
+    console.log('service worker installing');
+    // loading static html into cache first
+
+    self.skipWaiting();
+})
+// method that runs when the service worker is activated
+self.addEventListener('activate', event => {
+    console.log('service worker activating...')
+})
+// method that will run when the app makes fetch calls
+self.addEventListener('fetch', event => {
+    console.log('fetching', event.request.url);
+});
+
+
+
+
+Step 2: 
+create another two files (outside js folder) named as
+	1. manifest.json
+
+{
+    "name": "my_first_manifest",
+    "short_name": "first_manifest",
+    "start_url": "/index.html",
+    "display": "fullscreen",
+    "background_color": "#ffff00",
+    "description": "A simple applicationfor manifestation",
+    "orientation": "portrait-primary",
+    "theme_color":"#2196F3",
+    "icons": [
+    {
+    "src": "/icons/rvce_logo.png",
+    "sizes": "432x432",
+    "type": "image/png"
+    },
+    {
+    "src": "/icons/rvce_logo(1).png",
+    "sizes": "108x108",
+    "type": "image/png"
+    },
+    {
+    "src": "/icons/rvce_logo(2).png",
+    "sizes": "216x216",
+    "type": "image/png"
+    }
+    ]
+    }
+
+2. index.html
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>prog 7</title>
+<link rel="manifest" href="./Manifest.json">
+</head>
+<body>
+<script src="/js/start.js"></script>
+<p>Username: <input type="text" name="username" id="username"></p>
+<p>Password: <input type="password" name="password" id="password"></p>
+<p><input type="submit" value="check" onclick="verify()"></p>
+inside the html page with manifest
+</body>
+</html>
+
+
+
+
