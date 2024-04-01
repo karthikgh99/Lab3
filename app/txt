@@ -1,0 +1,764 @@
+1. Program One
+XML
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+ <item
+ android:state_enabled="false"
+ android:drawable="@drawable/disabled"/>
+ <item
+ android:state_pressed="true"
+ android:drawable="@drawable/pressed"/>
+ <item
+ android:drawable="@drawable/bydefault"/>
+</selector>
+MainActivity.java
+package com.example.firstapp;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CalendarView;
+import android.widget.CompoundButton;
+import android.widget.ImageButton;
+import android.widget.Switch;
+import android.widget.Toast;
+public class MainActivity extends AppCompatActivity {
+ ImageButton ib;
+ Switch sw;
+ ConstraintLayout cLayout;
+ @Override
+ protected void onCreate(Bundle savedInstanceState) {
+ super.onCreate(savedInstanceState);
+ setContentView(R.layout.activity_main);
+ ib = findViewById(R.id.imageButton);
+ sw = findViewById(R.id.switch1);
+ cLayout = findViewById(R.id.layout1);
+ ib.setOnClickListener(new View.OnClickListener() {
+ @Override
+ public void onClick(View v) {
+ Toast.makeText(getApplicationContext(), "Button Pressed",
+Toast.LENGTH_LONG).show();
+ }
+ });
+ sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+ @Override
+ public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+ if(isChecked){
+ ib.setEnabled(true);
+ sw.setText("Enabled");
+ }
+ else{
+ ib.setEnabled(false);
+ sw.setText("Disabled");
+ }
+ }
+ });
+ CalendarView cv = new CalendarView(getApplicationContext());
+ ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(
+ ConstraintLayout.LayoutParams.MATCH_PARENT,
+ ViewGroup.LayoutParams.MATCH_PARENT
+ );
+ cLayout.addView(cv, lp);
+ }
+}
+2. Pragram Two
+MainActivity
+package com.example.secondapp;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.os.Handler;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+public class MainActivity extends AppCompatActivity {
+ ProgressBar pg;
+ TextView tv;
+ Button bt;
+ int progressStatus = 0;
+ Handler handler = new Handler();
+ @Override
+ protected void onCreate(Bundle savedInstanceState) {
+ super.onCreate(savedInstanceState);
+ setContentView(R.layout.activity_main);
+ pg = findViewById(R.id.progressBar);
+ tv = findViewById(R.id.textView);
+ bt = findViewById(R.id.button);
+ new Thread(new Runnable() {
+ @Override
+ public void run() {
+ while(progressStatus < 100){
+ progressStatus += 1;
+ handler.post(new Runnable() {
+ @Override
+ public void run() {
+ pg.setProgress(progressStatus);
+ tv.setText(progressStatus + "%");
+ }
+ });
+ try{
+ Thread.sleep(800);
+ }catch(InterruptedException e){
+ e.printStackTrace();
+ }
+ }
+ }
+ }).start();
+ bt.setOnClickListener(new View.OnClickListener() {
+ @Override
+ public void onClick(View v) {
+ AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+ builder.setTitle("Warning!");
+ builder.setIcon(R.mipmap.ic_launcher);
+ builder.setMessage("Are you sure buddy?");
+ builder.setPositiveButton("yes", (dialog, which) -> {
+ finish();
+ });
+ builder.setNegativeButton("no", (dialog, which) -> {
+ dialog.cancel();
+ });
+ builder.setNeutralButton("cancel", (dialog, which) -> {
+ dialog.cancel();
+ });
+ builder.setCancelable(false);
+ AlertDialog ad = builder.create();
+ ad.show();
+ }
+ });
+ }
+}
+3. Program Three
+MainActivity.java
+package com.example.thirdapp;
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+public class MainActivity extends AppCompatActivity {
+ EditText edt;
+ Button btn;
+ @Override
+ protected void onCreate(Bundle savedInstanceState) {
+ super.onCreate(savedInstanceState);
+ setContentView(R.layout.activity_main);
+ edt = findViewById(R.id.editText);
+ btn = findViewById(R.id.button);
+ btn.setOnClickListener(new View.OnClickListener() {
+ @Override
+ public void onClick(View v) {
+ String str = edt.getText().toString();
+ Intent i = new Intent(MainActivity.this, SecondActivity.class);
+ i.putExtra("message", str);
+ startActivity(i);
+ }
+ });
+ }
+}
+SecondActivity.java
+package com.example.thirdapp;
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.TextView;
+public class SecondActivity extends AppCompatActivity {
+ TextView tv;
+ @Override
+ protected void onCreate(Bundle savedInstanceState) {
+ super.onCreate(savedInstanceState);
+ setContentView(R.layout.second_activity);
+ tv = findViewById(R.id.textView);
+ Intent i = getIntent();
+ String str = i.getStringExtra("message");
+ tv.setText("The String you sent is: " + str);
+ }
+}
+4. Program Four
+MainActivity.java
+package com.example.fourthapp;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+public class MainActivity extends AppCompatActivity {
+ FragmentOne fragmentOne = new FragmentOne();
+ FragmentTwo fragmentTwo = new FragmentTwo();
+ int switchFragment = 0;
+ @Override
+ protected void onCreate(Bundle savedInstanceState) {
+ super.onCreate(savedInstanceState);
+ setContentView(R.layout.activity_main);
+ FragmentManager fm = getSupportFragmentManager();
+ FragmentTransaction ft = fm.beginTransaction();
+ ft.add(R.id.cLayout, fragmentOne);
+ switchFragment = 1;
+ ft.commit();
+ }
+ public void switchNow(View v){
+ FragmentManager fm = getSupportFragmentManager();
+ FragmentTransaction ft = fm.beginTransaction();
+ if(switchFragment == 1){
+ ft.replace(R.id.cLayout, fragmentTwo);
+ switchFragment = 2;
+ }else{
+ ft.replace(R.id.cLayout, fragmentOne);
+ switchFragment = 1;
+ }
+ ft.commit();
+ }
+}
+5. Program Five
+MainActivity.java
+package com.example.fifthapp;
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import com.google.android.material.snackbar.Snackbar;
+public class MainActivity extends AppCompatActivity {
+ EditText uname, passwd;
+ Button sub;
+ DbHandler db;
+ @Override
+ protected void onCreate(Bundle savedInstanceState) {
+ super.onCreate(savedInstanceState);
+ setContentView(R.layout.activity_main);
+ uname = findViewById(R.id.editText);
+ passwd = findViewById(R.id.editText2);
+ sub = findViewById(R.id.button2);
+ sub.setOnClickListener(new View.OnClickListener() {
+ @Override
+ public void onClick(View v) {
+ String username = uname.getText().toString();
+ String password = passwd.getText().toString();
+ int id = checkUser(new User(username, password));
+ if(id == -1){
+ Snackbar.make(v, "User "+username+" does not exist",
+ Snackbar.LENGTH_LONG).show();
+ }else{
+ Snackbar.make(v, "User "+username+" exists", Snackbar.LENGTH_LONG).show();
+ Intent i = new Intent(MainActivity.this, SecondActivity.class);
+ startActivity(i);
+ }
+ }
+ });
+ db = new DbHandler(MainActivity.this);
+ db.addUser(new User("User1", "Pass1"));
+ db.addUser(new User("User2", "Pass2"));
+ db.addUser(new User("Pratheek", "Tmp@123"));
+ db.addUser(new User("User4", "Pass4"));
+ }
+ public int checkUser(User user){
+ return db.checkUser(user);
+ }
+}
+DbHandler.java
+package com.example.fifthapp;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+public class DbHandler extends SQLiteOpenHelper {
+ private static final int Db_version = 1;
+ private static final String Db_name="users", Table_Name="user", User_id="id",
+ User_name="name", User_password="password";
+ public DbHandler(MainActivity context) {
+ super(context,Db_name,null, Db_version);
+ }
+ @Override
+ public void onCreate(SQLiteDatabase db){
+ String Create_Table = "CREATE TABLE " + Table_Name + "(" + User_id + " INTEGER
+PRIMARY KEY, " + User_name + " TEXT, " + User_password + " TEXT" + ")";
+ db.execSQL(Create_Table);
+ }
+ @Override
+ public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){//
+ db.execSQL("DROP TABLE IF EXISTS " + Table_Name);
+ onCreate(db);
+ }
+ public void addUser(User usr) {
+ SQLiteDatabase db = this.getWritableDatabase();
+ ContentValues cv = new ContentValues();
+ cv.put(User_name, usr.getName());
+ cv.put(User_password, usr.getPassword());
+ db.insert(Table_Name, null, cv);
+ db.close();
+ }
+ public int checkUser(User user) {
+ int id = -1;
+ SQLiteDatabase db = this.getReadableDatabase();
+ Cursor cursor = db.rawQuery("SELECT name FROM user WHERE name=? AND
+password=?", new
+ String[]{
+ user.getName(), user.getPassword()
+ });
+ if(cursor.getCount() > 0){
+ cursor.moveToFirst();
+ id=cursor.getInt(0);
+ cursor.close();;
+ }
+ return id;
+ }
+}
+User.java
+package com.example.fifthapp;
+public class User {
+ int id;
+ String name, password;
+ public User(String name, String password){
+ this.name = name;
+ this.password = password;
+ }
+ public User(int id, String name, String password){
+ this.id = id;
+ this.name = name;
+ this.password = password;
+ }
+ public String getName() {return name;
+ }
+ public void setName(String name) {
+ this.name = name;
+ }
+ public int getId() {
+ return id;
+ }
+ public void setId(int id) {
+ this.id = id;
+ }
+ public String getPassword() {
+ return password;
+ }
+ public void setPassword(String password) {
+ this.password = password;
+ }
+}
+6. Program Six
+Manifest.xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+ xmlns:tools="http://schemas.android.com/tools">
+ <uses-feature
+ android:name="android.hardware.telephony"
+ android:required="false"/>
+ <uses-permission android:name="android.permission.SEND_SMS"/>
+ <application
+ android:allowBackup="true"
+ android:dataExtractionRules="@xml/data_extraction_rules"
+ android:fullBackupContent="@xml/backup_rules"
+ android:icon="@mipmap/ic_launcher"
+ android:label="@string/app_name"
+ android:roundIcon="@mipmap/ic_launcher_round"
+ android:supportsRtl="true"
+ android:theme="@style/Theme.SixthApp"
+ tools:targetApi="31">
+ <activity
+ android:name=".MainActivity"
+ android:exported="true">
+ <intent-filter>
+ <action android:name="android.intent.action.MAIN" />
+ <category android:name="android.intent.category.LAUNCHER" />
+ </intent-filter>
+ </activity>
+ </application>
+</manifest>
+MainActivity.java
+package com.example.sixthapp;
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.telephony.SmsManager;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+public class MainActivity extends AppCompatActivity {
+ EditText edt1, edt2;
+ Button btn;
+ @Override
+ protected void onCreate(Bundle savedInstanceState) {
+ super.onCreate(savedInstanceState);
+ setContentView(R.layout.activity_main);
+ edt1 = findViewById(R.id.editText);
+ edt2 = findViewById(R.id.editText2);
+ btn = findViewById(R.id.button);
+ btn.setOnClickListener(new View.OnClickListener() {
+ @Override
+ public void onClick(View v) {
+ try{
+ String phone = edt1.getText().toString();
+ String message = edt2.getText().toString();
+ SmsManager smgr = SmsManager.getDefault();
+ smgr.sendTextMessage(phone, null, message, null, null);
+ Toast.makeText(getApplicationContext(), "Message Sent",
+Toast.LENGTH_LONG).show();
+ }catch (Exception e){
+ Toast.makeText(getApplicationContext(), "Message Not Sent",
+Toast.LENGTH_LONG).show();
+ }
+ }
+ });
+ }
+}
+7&8. Program Seven and Eight
+index.html
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Login Page</title>
+<style>
+ h1,
+ p {
+ color: "blue";
+ font-family: "Comic Sans MS";
+ }
+ .button {
+ background-color: #4CAF50;
+ /* Green */
+ border: none;
+ color: white;
+ padding: 15px 32px;
+ text-align: center;
+ font-family: "Comic Sans MS";
+ display: inline-block;
+ font-size: 16px;
+ margin: 4px 2px;
+ cursor: pointer;
+ background-color: #008CBA;
+ width: 30%;
+ }
+ input[type=text],
+ [type=password] {
+ width: 30%;
+ padding: 12px 20px;
+ margin: 8px 0;
+ display: inline-block;
+ border: 1px solid #ccc;
+ border-radius: 4px;
+ box-sizing: border-box;
+ }
+</style>
+<link rel="manifest" href="manifest.json">
+<body>
+ <form action="/login" method="post">
+ <div style="margin-top:150px; text-align: center;">
+ <h1>
+ Login</h1><br><br>
+ <input type="text" placeholder="Enter Username" name="username" id="username" /><br>
+ <input type="password" placeholder="Enter Password" name="password" id="password"
+/><br><br>
+ <input type="submit" value="Login" class="button" />
+ </div>
+ </form>
+ <script>
+if('serviceWorker' in navigator){
+ Window.addEventListner('load', () => {
+ navigator.serviceWorker.register('sw.js', {
+ scope: "/"
+ }).then(register => {
+ console.log("Registered", register)
+ }).catch(error => {
+ console.log("Not registered", error)
+ })
+ });
+}
+</script>
+ <script src="main.js"></script>
+</body>
+</html>
+sw.js
+const cacheName = "site-cache-v1";
+const assetsToCache = ["/", "index.html", "error.html"];
+self.addEventListener("install", (event) => {
+ event.waitUntil(
+ caches.open(cacheName).then((cache) => {
+ return cache.addAll(assetsToCache);
+ })
+ );
+});
+self.addEventListener("activate", (event) => {
+ event.waitUntil(
+ caches.open(cacheName).then((cache) => {
+ return cache.addAll(assetsToCache);
+ })
+ );
+});
+self.addEventListener("fetch", (event) => {
+ event.respondWith(
+ caches.match(event.request).then((cacheResponse) => {
+ return cacheResponse || fetch(event.request);
+ })
+ );
+});
+manifest.json(additional for 8th)
+{
+ "name":"login_page",
+ "short_name":"login",
+ "description":"a simple app",
+ "id":"./",
+ "start_url":"./",
+ "scope":".",
+ "display":"standalone",
+ "theme_color":"#008BAC",
+ "background_color":"#008BAC",
+ "orientation":"portrait",
+ "display_override":["window-controls-overlay"],
+ "protocol_handlers":[
+ {
+ "protocol":"web+tea",
+ "url":"/tea?type=%s"
+ },
+ {
+ "protocol":"web+coffee",
+ "url":"/coffee?type=%s"
+ }
+ ],
+ "icons":[
+ {
+ "src":"/images/icons/icon-72x72.png",
+ "sizes":"72x72",
+ "type":"image/png",
+ "purpose":"any"
+ },
+ {
+ "src":"/images/icons/icon-96x96.png",
+ "sizes":"96x96",
+ "type":"image/png",
+ "purpose":"any"
+ },
+ {
+ "src":"/images/icons/icon-128x128.png",
+ "sizes":"128x128",
+ "type":"image/png",
+ "purpose":"any"
+ },
+ {
+ "src":"/images/icons/icon-144x144.png",
+ "sizes":"144x144",
+ "type":"image/png",
+ "purpose":"any"
+ },
+ {
+ "src":"/images/icons/icon-152x152.png",
+ "sizes":"152x152",
+ "type":"image/png",
+ "purpose":"any"
+ },
+ {
+ "src":"/images/icons/icon-192x192.png",
+ "sizes":"192x192",
+ "type":"image/png",
+ "purpose":"any"
+ },
+ {
+ "src":"/images/icons/icon-384x384.png",
+ "sizes":"384x384",
+ "type":"image/png",
+ "purpose":"any"
+ },
+ {
+ "src":"/images/icons/icon-512x512.png",
+ "sizes":"512x512",
+ "type":"image/png",
+ "purpose":"any"
+ }
+ ],
+ "screenshots":[
+ {
+ "src":"/images/screenshot1.png",
+ "sizes":"1919x1052",
+ "type":"/image/png",
+ "form_factor":"narrow",
+ "label":"PWAs"
+ },
+ {
+ "src":"/images/screenshot2.jpg",
+ "sizes":"1919x1052",
+ "type":"/image/jpg",
+ "form_factor":"wide",
+ "label":"PWAs"
+ }
+ ],
+ "splash_page":"null"
+}
+9. Program Nine
+index.html and other files are as same as 7 and 8. New paths should exist in server.js
+Additional Files
+gitpro.html
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<link rel="manifest" href="manifest.json">
+<body>
+ <h1>Github Profile</h1>
+ <input type="text" id="text_input">
+ <input type="button" onclick="gitdata()" value="get profile">
+ <div id='git_image'>
+ <img src="" alt="profile image" id="image">
+ <p id='para'></p>
+ </div>
+</body>
+<!-- Github API - https://api.github.com/users -->
+<script>
+ function gitdata()
+ {
+ var url = 'https://api.github.com/users/'+document.getElementById('text_input').value;
+
+ fetch(url)
+ .then(response => response.json())
+ .then(data =>{
+ console.log(data.avatar_url)
+ var im = document.getElementById("image");
+ im.setAttribute("src",data.avatar_url);
+ var gi = document.getElementById('para');
+ gi.innerHTML=JSON.stringify(data);
+ })
+ .catch(function(reponse){
+ return response.status;
+ console.log(response.status);
+ });;
+ }
+</script>
+</html>
+sw.js
+(function ()
+{
+ self.addEventListener('install', event =>{
+ console.log('service worker is installing');
+ event.waitUntil(
+ caches
+ .open('PWD_app')
+ .then(cache =>
+ caches.addAll([
+ '/git'
+ ])
+ )
+ )
+ self.skipWaiting();
+ })
+ self.addEventListener('activate',event=>{
+ event.waitUntil(caches.delete('PWD_app'));
+ console.log('service worker is activating');
+ })
+ self.addEventListener('fetch', event=>{
+ console.log('fetching', event.request.url);
+ event.respondWith(
+
+ caches.match(event.request).then(async (response)=>
+ {
+ if(response){
+ return response
+ }
+
+ let data = fetch(event.request);
+ let data_clone = (await data).clone();
+ event.waitUntil(caches.open('PWD_app').then(cache =>
+cache.put(event.request,data_clone)));
+ return data
+ })
+ )
+ })
+}
+)
+10 Program Ten
+All files are as same as 7 and 8. New path for stock.html should exist in server.js
+Additional Files
+stock.html (A stock.json should also exist locally to access the json data)
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<center>
+<h1>Real Time Fetch with Simple Balance Sheet Statement</h1>
+<table id='tbl' border=1>
+<tr>
+<th style="width: 120px;"> date </th>
+<th style="width: 120px;"> netReceivables </th>
+<th style="width: 120px;"> cashAndCashEquivalents </th>
+<th style="width: 120px;"> taxAssets </th>
+<th style="width: 120px;"> otherCurrentLiabilities </th>
+<th style="width: 120px;"> commonStock </th>
+<th style="width: 120px;"> totalInvestments </th>
+</tr>
+</table>
+</center>
+</body>
+<!-- https://financialmodelingprep.com/api/v3/balance-sheetstatement/AAPL?period=annual&apikey=RslEVBRQCqRMloHRNgFZKgkM1UhHPCKM" -->
+<script>
+ window.addEventListener('DOMContentLoaded',(event) => {
+ let source = ["/stock.json"]
+ let index = 0
+ while(index < source.length){
+ console.log("fetching from "+ source[index]);
+ fetch(source[index])
+ .then(response => response.json())
+ .then(data => {
+ console.log(data);
+ let dat = JSON.stringify(data);
+ dat1 = data;
+ console.log(dat1);
+ let bod = document.getElementById("body");
+ // var tb = document.getElementById("tb1");
+ var tb = document.getElementById("tbl");
+ for(let i=0; i<dat1.length;i++)
+ {
+ var tr = document.createElement('tr');
+ var td = document.createElement('td');
+ td.innerHTML = dat1[i]["date"];
+ tr.appendChild(td);
+ tb.appendChild(tr);
+ var td = document.createElement('td');
+ td.innerHTML = dat1[i]["netReceivables"];
+ tr.appendChild(td);
+ tb.appendChild(tr);
+ var td = document.createElement('td');
+ td.innerHTML = dat1[i]["cashAndCashEquivalents"];
+ tr.appendChild(td);
+ tb.appendChild(tr);
+ var td = document.createElement('td');
+ td.innerHTML = dat1[i]["taxAssets"];
+ tr.appendChild(td);
+ tb.appendChild(tr);
+ var td = document.createElement('td');
+ td.innerHTML = dat1[i]["otherCurrentLiabilities"];
+ tr.appendChild(td);
+ tb.appendChild(tr);
+ var td = document.createElement('td');
+ td.innerHTML = dat1[i]["commonStock"];
+ tr.appendChild(td);
+ tb.appendChild(tr);
+ var td = document.createElement('td');
+ td.innerHTML = dat1[i]["totalInvestments"];
+ tr.appendChild(td);
+ tb.appendChild(tr);
+ }
+ })
+ .catch(err => console.log('err', err));
+ index+=1;
+ }
+ });
+</script>
+</html>
+sw.js
+(function(){
+ self.addEventListener('install',event =>{
+ console.log('service worker installing');
+ self.skipWaiting();
+ })
+ self.addEventListener('activate',event=>{
+ console.log('service worker activating...')
+ })
+ self.addEventListener('fetch',event=>{
+ console.log('fetching',event.request.url);
+ })
+})
